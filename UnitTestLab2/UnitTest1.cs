@@ -61,7 +61,7 @@ namespace UnitTestLab2
                 { -3,-1,-5,-5 },
             };
 
-            decimal[] validData = { -15.75m, -1.375m, -1 };
+            decimal[] validData = { 73m/49, 223m/147, -29m/147 };
             decimal[] data = MatrixMath.CalculateGauss(matrix);
             decimal delta = 0.01m;
 
