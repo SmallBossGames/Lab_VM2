@@ -6,9 +6,12 @@ using System.Threading.Tasks;
 
 namespace Lab2_VM
 {
-    public class MatrixMath
+    public static class MatrixMath
     {
-
+        /// <summary>
+        /// Вычисляет значения корней СЛАУ по методу Гаусса
+        /// </summary>
+        /// <param name="matrix">Входная расширенная матрица</param>
         public static decimal[] CalculateGauss(decimal[,] matrix)
         {
             var strCount = matrix.GetLength(0);
@@ -55,6 +58,9 @@ namespace Lab2_VM
             return resArray;
         }
 
+        /// <summary>
+        /// Находит индекс строки, в которой значение заданного элемента наибольшее
+        /// </summary>
         public static int MaxAbsStringIndex(decimal[,] matrix, int column, int startStr, int endStr)
         {
             int maxIndex = startStr;
@@ -66,24 +72,32 @@ namespace Lab2_VM
             return maxIndex;
         }
 
+        /// <summary>
+        /// Меняет местами строки в матрице
+        /// </summary>
+        /// <param name="matrix">Матрица</param>
+        /// <param name="index1">Индекс первой строки</param>
+        /// <param name="index2">Индекс второй строки</param>
         static void SwapString(decimal[,] matrix, int index1, int index2)
         {
             if (index1 == index2) return;
             for (int i = 0; i < matrix.GetLength(1); i++)
-            {
-                var pool = matrix[index1, i];
-                matrix[index1, i] = matrix[index2, i];
-                matrix[index2, i] = pool;
-            }
+                (matrix[index1, i], matrix[index2, i]) = (matrix[index2, i], matrix[index1, i]);
         }
 
-        static void StringSum(decimal[,] matrix, int from, int to, decimal koeff)
+        /// <summary>
+        /// К указанной строке прибавляется другая, домноженная на коэффициент
+        /// </summary>
+        static void StringSum(decimal[,] matrix, int from, int to, decimal koeff=1)
         {
             for (int i = 0; i < matrix.GetLength(1); i++)
                 matrix[to, i] += matrix[from, i] * koeff;
         }
 
-        static void DivideString(decimal[,] matrix, int index, decimal koeff)
+        /// <summary>
+        /// Делит строку на указанный коэффициент
+        /// </summary>
+        static void DivideString(decimal[,] matrix, int index, decimal koeff=1)
         {
             var length = matrix.GetLength(1);
             for (var i = 0; i < length; i++)
@@ -91,6 +105,88 @@ namespace Lab2_VM
         }
 
         public static decimal Abs(decimal value) => value > 0 ? value : -value;
+
+
+        /// <summary>
+        /// Вычисляет значения корней СЛАУ по методу Зейделя
+        /// </summary>
+        /// <param name="matrix">Входная расширенная матрица</param>
+        public static decimal[] CalculateZeidel(decimal[,] matrix, decimal accuracy)
+        {
+            var strCount = matrix.GetLength(0);
+            var columnCount = matrix.GetLength(1);
+
+            
+
+            if (strCount + 1 != columnCount) throw new IncorrectMatrixException();
+
+            var poolMatrix = new decimal[strCount, columnCount];
+            decimal[]
+                lastResArray = new decimal[strCount],
+                resArray = new decimal[strCount];
+
+            for (var i = 0; i < strCount; i++)
+            {
+                for (var j = 0; j < strCount; j++)
+                {
+                    poolMatrix[i, j] = -(matrix[i, j] / matrix[i, i]);
+                }
+                poolMatrix[i, columnCount - 1] = (matrix[i, columnCount - 1] / matrix[i, i]);
+                resArray[i] = poolMatrix[i, columnCount - 1];
+            }
+
+            do
+            {
+                (lastResArray, resArray) = (resArray, lastResArray);
+
+                for (var i = 0; i < strCount; i++)
+                {
+                    resArray[i] = 0;
+
+                    for (var j = 0; j < i; j++)
+                    {
+                        resArray[i] += resArray[j] * poolMatrix[i, j];
+                    }
+
+                    for (var j = i+1; j < columnCount - 1; j++)
+                    {
+                        resArray[i] += lastResArray[j] * poolMatrix[i, j];
+                    }
+
+                    resArray[i] += poolMatrix[i, columnCount - 1];
+                }
+            } while (!CheckAccuracy(resArray, lastResArray, accuracy));
+
+            return resArray;
+        }
+
+        private static bool CheckAccuracy(decimal[] newRes, decimal[] lastRes, decimal eps)
+        {
+            var length = newRes.Length;
+            var delta = 0.0m;
+
+            if (length != lastRes.Length) throw new FormatException();
+
+            for (int i = 0; i < length; i++)
+                delta += (newRes[i] - lastRes[i]) * (newRes[i] - lastRes[i]);
+
+            delta = (decimal)Math.Sqrt((double)delta);
+
+            if (delta < eps)
+                return true;
+
+            return false;
+        }
+
+        public static bool CheckСonvergence(decimal[,] matrix)
+        {
+            var strCount = matrix.GetLength(0);
+            var columnCount = matrix.GetLength(1);
+
+            throw new NotImplementedException();
+        }
+
+
 
         class IncorrectMatrixException:Exception
         {

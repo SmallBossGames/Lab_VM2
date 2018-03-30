@@ -25,11 +25,12 @@ namespace Lab2_VM
         {
             decimal[,] matrix =
             {
-                { -7,2,-2,-7 },
-                { -2,5,-2,5 },
-                { -3,-1,-5,-5 },
+                { 1,2,3,3 },
+                { 3,5,7,0 },
+                { 1,3,4,1 },
             };
-            decimal[] data = MatrixMath.CalculateGauss(matrix);
+            decimal[] data = MatrixMath.CalculateZeidel(matrix, 0.0001m);
+            decimal[] data2 = MatrixMath.CalculateGauss(matrix);
             InitializeComponent();
         }
     }
