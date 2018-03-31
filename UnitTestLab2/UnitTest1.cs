@@ -7,7 +7,32 @@ namespace UnitTestLab2
     [TestClass]
     public class UnitTest1
     {
-        
+        decimal[,] matrix1 =
+            {
+                { -7,2,-2,-7 },
+                { -2,5,-2,5 },
+                { -3,-1,-5,-5 },
+            };
+
+        decimal[] validData1 = { 73m / 49, 223m / 147, -29m / 147 };
+
+        decimal[,] matrix2 =
+            {
+                { 1,2,3,3 },
+                { 3,5,7,0 },
+                { 1,3,4,1 },
+            };
+
+        decimal[] validData2 = { -4, -13, 11 };
+
+        decimal[,] matrix3 =
+        {
+                { 100,5,6,7 },
+                { 6,100,7,0 },
+                { 9,3,300,14 },
+        };
+
+
 
         [TestMethod]
         public void TestMaxStringIndex()
@@ -33,43 +58,60 @@ namespace UnitTestLab2
         [TestMethod]
         public void TestGauss1()
         {
-            decimal[,] matrix =
-            {
-                { 1,2,3,3 },
-                { 3,5,7,0 },
-                { 1,3,4,1 },
-            };
-
-            decimal[] validData = { -4, -13, 11 };
-            decimal[] data = MatrixMath.CalculateGauss(matrix);
+            decimal[] data = MatrixMath.CalculateGauss(matrix2);
             decimal delta = 0.0001m;
 
-            Assert.AreEqual(validData.Length, data.Length);
+            Assert.AreEqual(validData2.Length, data.Length);
 
-            for (var i = 0; i < validData.Length; i++)
-                if (MatrixMath.Abs(data[i] - validData[i]) > delta)
-                    Assert.Fail(MatrixMath.Abs(data[i] - validData[i]).ToString());
+            for (var i = 0; i < validData2.Length; i++)
+                if (MatrixMath.Abs(data[i] - validData2[i]) > delta)
+                    Assert.Fail(MatrixMath.Abs(data[i] - validData2[i]).ToString());
         }
 
         [TestMethod]
         public void TestGauss2()
         {
-            decimal[,] matrix =
-            {
-                { -7,2,-2,-7 },
-                { -2,5,-2,5 },
-                { -3,-1,-5,-5 },
-            };
-
-            decimal[] validData = { 73m/49, 223m/147, -29m/147 };
-            decimal[] data = MatrixMath.CalculateGauss(matrix);
+            decimal[] data = MatrixMath.CalculateGauss(matrix1);
             decimal delta = 0.01m;
 
-            Assert.AreEqual(validData.Length, data.Length);
+            Assert.AreEqual(validData1.Length, data.Length);
 
-            for (var i = 0; i < validData.Length; i++)
-                if (MatrixMath.Abs(data[i] - validData[i]) > delta)
-                    Assert.Fail(MatrixMath.Abs(data[i] - validData[i]).ToString());
+            for (var i = 0; i < validData1.Length; i++)
+                if (MatrixMath.Abs(data[i] - validData1[i]) > delta)
+                    Assert.Fail(MatrixMath.Abs(data[i] - validData1[i]).ToString());
+        }
+
+        [TestMethod]
+        public void TestZeidel1()
+        {
+            decimal[] data = MatrixMath.CalculateZeidel(matrix2, 0.00001m);
+            decimal delta = 0.0001m;
+
+            Assert.AreEqual(validData2.Length, data.Length);
+
+            for (var i = 0; i < validData2.Length; i++)
+                if (MatrixMath.Abs(data[i] - validData2[i]) > delta)
+                    Assert.Fail(MatrixMath.Abs(data[i] - validData2[i]).ToString());
+        }
+
+        [TestMethod]
+        public void TestZeidel2()
+        {
+            decimal[] data = MatrixMath.CalculateZeidel(matrix1, 0.00001m);
+            decimal delta = 0.0001m;
+
+            Assert.AreEqual(validData1.Length, data.Length);
+
+            for (var i = 0; i < validData1.Length; i++)
+                if (MatrixMath.Abs(data[i] - validData1[i]) > delta)
+                    Assert.Fail(MatrixMath.Abs(data[i] - validData1[i]).ToString());
+        }
+
+        [TestMethod]
+        public void TestCheckConvergence()
+        {
+            Assert.AreEqual(MatrixMath.CheckСonvergence(matrix3), true);
+            Assert.AreEqual(MatrixMath.CheckСonvergence(matrix1), false);
         }
     }
 }

@@ -8,6 +8,7 @@ namespace Lab2_VM
 {
     public static class MatrixMath
     {
+
         /// <summary>
         /// Вычисляет значения корней СЛАУ по методу Гаусса
         /// </summary>
@@ -116,7 +117,6 @@ namespace Lab2_VM
             var strCount = matrix.GetLength(0);
             var columnCount = matrix.GetLength(1);
 
-            
 
             if (strCount + 1 != columnCount) throw new IncorrectMatrixException();
 
@@ -132,7 +132,7 @@ namespace Lab2_VM
                     poolMatrix[i, j] = -(matrix[i, j] / matrix[i, i]);
                 }
                 poolMatrix[i, columnCount - 1] = (matrix[i, columnCount - 1] / matrix[i, i]);
-                resArray[i] = poolMatrix[i, columnCount - 1];
+                resArray[i] =  poolMatrix[i, columnCount - 1];
             }
 
             do
@@ -160,6 +160,13 @@ namespace Lab2_VM
             return resArray;
         }
 
+
+        /// <summary>
+        /// Проверяет точность вычисления
+        /// </summary>
+        /// <param name="newRes">Новые значения корней</param>
+        /// <param name="lastRes">Старые значения корней</param>
+        /// <param name="eps">Точность</param>
         private static bool CheckAccuracy(decimal[] newRes, decimal[] lastRes, decimal eps)
         {
             var length = newRes.Length;
@@ -168,9 +175,7 @@ namespace Lab2_VM
             if (length != lastRes.Length) throw new FormatException();
 
             for (int i = 0; i < length; i++)
-                delta += (newRes[i] - lastRes[i]) * (newRes[i] - lastRes[i]);
-
-            delta = (decimal)Math.Sqrt((double)delta);
+                delta += Abs(newRes[i] - lastRes[i]);
 
             if (delta < eps)
                 return true;
@@ -178,12 +183,23 @@ namespace Lab2_VM
             return false;
         }
 
+        /// <summary>
+        /// Проверяет сходимость согласно критерию (матрица должна быть диагонально доминирующей)
+        /// </summary>
         public static bool CheckСonvergence(decimal[,] matrix)
         {
             var strCount = matrix.GetLength(0);
-            var columnCount = matrix.GetLength(1);
 
-            throw new NotImplementedException();
+            for (var i = 0; i < strCount; i++)
+            {
+                var norm = 0m;
+                for (var j = 0; j < strCount; j++)
+                    if (i != j) norm += Abs(matrix[i, j]);
+
+                if (matrix[i,i] <= norm) return false;
+            }
+
+            return true;
         }
 
 
