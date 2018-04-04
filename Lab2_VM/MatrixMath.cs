@@ -15,48 +15,48 @@ namespace Lab2_VM
         /// <param name="matrix">Входная расширенная матрица</param>
         public static decimal[] CalculateGauss(decimal[,] matrix)
         {
+            var triangleMatrix = GetTriangleGaussMatrix(matrix);
+            return GetResultArray(triangleMatrix);
+        }
+
+        /// <summary>
+        /// Вычисляет значения корней СЛАУ по методу Гаусса и возвращает треугольную матрицу
+        /// как параметр
+        /// </summary>
+        /// <param name="matrix">Входная расширенная матрица</param>
+        public static decimal[] CalculateGauss(decimal[,] matrix, out decimal[,] triangleMatrix)
+        {
+            triangleMatrix = GetTriangleGaussMatrix(matrix);
+            return GetResultArray(triangleMatrix);
+        }
+
+        public static decimal[,] GetTriangleGaussMatrix(decimal[,] matrix)
+        {
             var strCount = matrix.GetLength(0);
             var columnCount = matrix.GetLength(1);
-            var resArray = new decimal[strCount];
 
             if (strCount + 1 != columnCount) throw new IncorrectMatrixException();
 
+            var outMatrix = matrix.Clone() as decimal[,];
+
             for (var i = 0; i < strCount; i++)
             {
-                var maxIndex = MaxAbsStringIndex(matrix, i, i, strCount-1);
+                var maxIndex = MaxAbsStringIndex(outMatrix, i, i, strCount - 1);
 
-                if (matrix[i, maxIndex] == 0) throw new IncorrectMatrixException();
+                if (outMatrix[i, maxIndex] == 0) throw new IncorrectMatrixException();
 
-                SwapString(matrix, i, maxIndex);
+                SwapString(outMatrix, i, maxIndex);
 
                 for (var j = i + 1; j < strCount; j++)
                 {
-                    var koeff = -(matrix[j, i] / matrix[i, i]);
-                    StringSum(matrix, i, j, koeff);
-                    matrix[j, i] = 0;
+                    var koeff = -(outMatrix[j, i] / outMatrix[i, i]);
+                    StringSum(outMatrix, i, j, koeff);
                 }
 
-                DivideString(matrix, i, matrix[i, i]);
+                DivideString(outMatrix, i, outMatrix[i, i]);
             }
 
-            for (var i = strCount - 1; i > -1; i--) 
-            {
-                var result = matrix[i, columnCount - 1];
-
-                for (var j = i + 1; j < strCount; j++)
-                    result -= matrix[i, j] * resArray[j];
-
-                resArray[i] = result;
-            }
-
-            for (var i = 0 ; i < strCount; i++)
-            {
-                for (var j = 0; j < columnCount; j++)
-                    Console.Write(matrix[i, j].ToString() + ' ');
-                Console.WriteLine();
-            }
-
-            return resArray;
+            return outMatrix;
         }
 
         /// <summary>
@@ -103,6 +103,28 @@ namespace Lab2_VM
             var length = matrix.GetLength(1);
             for (var i = 0; i < length; i++)
                 matrix[index, i] /= koeff;
+        }
+
+        static decimal[] GetResultArray(decimal[,] upTriangleMatrix)
+        {
+            var strCount = upTriangleMatrix.GetLength(0);
+            var columnCount = upTriangleMatrix.GetLength(1);
+
+            if (strCount + 1 != columnCount) throw new IncorrectMatrixException();
+
+            var resArray = new decimal[strCount];
+
+            for (var i = strCount - 1; i > -1; i--)
+            {
+                var result = upTriangleMatrix[i, columnCount - 1];
+
+                for (var j = i + 1; j < strCount; j++)
+                    result -= upTriangleMatrix[i, j] * resArray[j];
+
+                resArray[i] = result;
+            }
+
+            return resArray;
         }
 
         public static decimal Abs(decimal value) => value > 0 ? value : -value;
